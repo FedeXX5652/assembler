@@ -20,4 +20,4 @@
 *.out
 *.app
 
-gcc_asesembler/*
+gcc_asesembler/
