@@ -1,0 +1,2 @@
+nasm file.asm -f win64
+gcc file.obj -o file_output_name
