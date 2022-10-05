@@ -13,16 +13,16 @@ section .data
 
 section .bss
     texto    resb 100
-    caracter    resb 1
 
 section .text
-main:   ; main siempre va debajo de .text
+main:
+    mov rbp, rsp; for correct debugging   ; main siempre va debajo de .text
     mov     rcx, msjIngTexto
     sub     rsp, 32
     call    puts        ; para todas las fuciones de C primero resto 32 a rsp y despues lo vuelvo a sumar
     add     rsp, 32
 
-    mov     rcx, msjIngTexto
+    mov     rcx, texto
     sub     rsp, 32
     call    gets
     add     rsp, 32
@@ -32,13 +32,4 @@ main:   ; main siempre va debajo de .text
     call    puts
     add     rsp, 32
 
-    mov     rsi, 0
-    cmp     byte[texto + rsi],0
-    je      finString
-
-    inc     qword[longTexto]
-
-    mov     al, [texto + rsi]
-    cmp     al, [caracter]
-
-ret
+    ret
