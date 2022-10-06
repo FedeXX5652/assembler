@@ -16,7 +16,7 @@ section .bss
 
 section .text
 main:
-    mov rbp, rsp; for correct debugging   ; main siempre va debajo de .text
+    mov     rbp, rsp; for correct debugging   ; main siempre va debajo de .text
     mov     rcx, msjIngTexto
     sub     rsp, 32
     call    puts        ; para todas las fuciones de C primero resto 32 a rsp y despues lo vuelvo a sumar
