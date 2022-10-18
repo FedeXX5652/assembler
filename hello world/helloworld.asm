@@ -1,6 +1,3 @@
-bits 64
-default rel
-
 section .data
     msg db "Hello world", 0xd, 0xa, 0
 
@@ -20,3 +17,5 @@ main:
 
     xor rax, rax
     call ExitProcess
+
+ret
