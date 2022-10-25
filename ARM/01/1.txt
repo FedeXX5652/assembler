@@ -1,0 +1,31 @@
+por que ARM?
+- la simplicidad de los procesadores los hace ideales para aplicaciones de baja potencia
+- dominantes dentro del mercado de la electronica movil
+
+CARACTERISTICAS PRINCIPALES:
+- arch load/store
+- instrucciones de long fija (32 bits)
+- formatos de instrucciones de 3 direcciones
+    - 2 registros de operandos
+    - 1 registro de resultado
+- ejecucion condicional de TODAS las instrucciones
+- instrucciones de load-store de registros multiples
+
+ORGANIZAION DE REGISTROS:
+- r0 a r12 de proposito general (32 bits)
+- r13 stack pointer (SP)
+- r14 linck register (LR)
+- r15 program counter (PC)
+- current program status register (CPSR) contiene indicadores condicionales y otras bits de estado
+
+ESTRUCTURA DE UN PROGRAMA:
+- forma general:
+    label <espacio> opcode <espacio> operandos <espacio> @ comentario
+- cada campo debe estar separado por uno o mas espacios
+- las instrucciones no empiezan en la primera columna, dado que deben estar precedidas por un espacio en blanco, incluso aunque no haya label
+- ARM acepta lineas en blanco para mejor claridad del codigo
+
+SECCIONES DEL PROGRAMA:
+.text   codigo
+.data   variables
+.asciz  ???
