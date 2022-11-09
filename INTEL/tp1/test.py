@@ -1,20 +1,19 @@
-packages = []
-is_exit = False
-max_packages = -1
-i = 0
-
-while max_packages <= 0 or max_packages > 20:
-    max_packages = int(input("Ingrese la cantidad de paquetes (1-20): "))
-
-while i<=max_packages and not is_exit:
-    weight = int(input("Ingrese el peso del paquete nº"+str(i+1)+" (ingrese -1 para terminar de ingresar): "))
-    if weight == -1:
-        is_exit = True
-    else:
-        if weight > 11 or weight <= 0:
-            print("Peso invalido (1-11)")
+def grupos(w:int, wt:list, n:int, suma:int, package:list):
+    if n>0:
+        if suma+wt[0] <= w:
+            for i in range(n):
+                print(i)
+                package.append(wt[i])
+                suma += wt[i]
+                wt.pop(i)
+            grupos(w, wt, n-1, suma, package)
         else:
-            packages.append(weight)
-            i+=1
+            print("pack:",package)
+            grupos(w, wt, n, 0, [])
 
-print(packages)
+ 
+ 
+wt = [8,7,6,9,5,11,5,9,4,1,1,1,1,3,5]
+w = 11
+n = len(wt)
+grupos(w, wt, n, 0, [])
