@@ -1,19 +1,26 @@
-def grupos(w:int, wt:list, n:int, suma:int, package:list):
-    if n>0:
-        if suma+wt[0] <= w:
-            for i in range(n):
-                print(i)
-                package.append(wt[i])
-                suma += wt[i]
-                wt.pop(i)
-            grupos(w, wt, n-1, suma, package)
-        else:
-            print("pack:",package)
-            grupos(w, wt, n, 0, [])
+def grupos(mw:int, wt:list):
+    n = len(wt)
+    i = 0
+    suma = 0
+    pack = []
+    while n > 0:
+        while suma < mw and i<len(wt):
+            if wt[i] != 0 and suma+wt[i] <= mw:
+                suma+=wt[i]
+                pack.append(wt[i])
+                wt[i] = 0
+                n = n-1
+            i+=1
+        print(pack, suma)
+        pack = []
+        suma = 0
+        i = 0
+
 
  
- 
 wt = [8,7,6,9,5,11,5,9,4,1,1,1,1,3,5]
-w = 11
-n = len(wt)
-grupos(w, wt, n, 0, [])
+mw = 11
+print("ORDENADO")
+grupos(mw, sorted(wt, reverse=True))
+print("\nDESORDENADO")
+grupos(mw, wt)

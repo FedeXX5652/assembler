@@ -7,7 +7,7 @@ extern gets
 extern sscanf
 
 section .data
-    debug db "DEBUG: %i - ",0
+    debug db "DEBUG: %i - ",10,0
     msgIngreso db "Ingrese 5 numeros (maximo 10 caracteres c/u):",0
     cantDatos dq 5
     aux dq 0
@@ -37,9 +37,9 @@ llenarVector:
 loopLlenar:
     push rcx        ; rcx -> pila para poder pedir input
 
-    ;mov rdx,rcx     ; rcx -> rdx para poder imprimir el valor que tenga rcx
-    ;mov rcx,debug   ; imprimo el valor de rcx (ahora en rdx)
-    ;call printf
+    ; mov rdx,rcx     ; rcx -> rdx para poder imprimir el valor que tenga rcx
+    ; mov rcx,debug   ; imprimo el valor de rcx (ahora en rdx)
+    ; call printf
 
     mov rcx,buffer  ; pido input
     call gets
@@ -48,6 +48,10 @@ loopLlenar:
     mov rdx,intFormat
     mov r8,ingreso
     call sscanf
+
+    mov rcx,debug
+    mov rdx,[ingreso]
+    call printf
 
     pop rcx
     
