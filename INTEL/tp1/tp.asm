@@ -28,77 +28,77 @@ fin:
 
 
 crearPaquetes:
-nuevoPaquete:
-    add qword[paquetes],1
-    mov rcx,msgNuevoPaquete
-    mov rdx,[paquetes]
-    call printf
-    mov rbx,0
-    mov qword[suma],0
-    mov qword[posicion],0
-suma0:
-    sub [suma],rbx
-    ;mov rcx,msgSuma0
-    ;mov rdx,[suma]
-    ;call printf
-recorrer:
-    ;mov r11,[posicion]
-    
-    add qword[posicion],1
+    nuevoPaquete:
+        add qword[paquetes],1
+        mov rcx,msgNuevoPaquete
+        mov rdx,[paquetes]
+        call printf
+        mov rbx,0
+        mov qword[suma],0
+        mov qword[posicion],0
+    suma0:
+        sub [suma],rbx
+        ;mov rcx,msgSuma0
+        ;mov rdx,[suma]
+        ;call printf
+    recorrer:
+        ;mov r11,[posicion]
+        
+        add qword[posicion],1
 
-    mov        rcx,[posicion]    ;rcx = posicion
-    dec        rcx                ;(posicion-1)
-    imul    ebx,ecx,2        ;(posicion-1)*longElem
+        mov        rcx,[posicion]    ;rcx = posicion
+        dec        rcx                ;(posicion-1)
+        imul    ebx,ecx,2        ;(posicion-1)*longElem
 
-    mov        ax,[vecNum+ebx]    ;ax = elemento (2 bytes / word)
-    cwde                    ;eax= elemento (4 bytes / doble word)
-    cdqe                    ;rax= elemento (8 bytes / quad word)
+        mov        ax,[vecNum+ebx]    ;ax = elemento (2 bytes / word)
+        cwde                    ;eax= elemento (4 bytes / doble word)
+        cdqe                    ;rax= elemento (8 bytes / quad word)
 
-    imul    ebx,ecx,10        ;(posicion-1)*longElem
+        imul    ebx,ecx,10        ;(posicion-1)*longElem
 
-    mov rbx,rax
+        mov rbx,rax
 
-    mov rcx, [tope]
-    cmp rcx,[posicion]
-    jl checkVacio
+        mov rcx, [tope]
+        cmp rcx,[posicion]
+        jl checkVacio
 
-    cmp rbx,-1
-    je recorrer
+        cmp rbx,-1
+        je recorrer
 
-    ;mov        rcx,msgSal        ;Param 1: mensaje
-    ;mov        rdx,r11    ;Param 2: posicion
-    ;mov        r8,rax            ;Param 3: Contenido de la posicion
-    ;call    printf
+        ;mov        rcx,msgSal        ;Param 1: mensaje
+        ;mov        rdx,r11    ;Param 2: posicion
+        ;mov        r8,rax            ;Param 3: Contenido de la posicion
+        ;call    printf
 
-    ;mov rcx,msgInt
-    ;mov rdx,[posicion]
-    ;call printf
-    
-    add [suma],rbx
+        ;mov rcx,msgInt
+        ;mov rdx,[posicion]
+        ;call printf
+        
+        add [suma],rbx
 
-    cmp qword[suma],11
-    jg suma0
+        cmp qword[suma],11
+        jg suma0
 
-    mov rcx,msgSuma
-    mov rdx,rbx
-    mov r8,[suma]
-    mov r9,[posicion]
-    call printf
+        mov rcx,msgSuma
+        mov rdx,rbx
+        mov r8,[suma]
+        mov r9,[posicion]
+        call printf
 
-    mov        rcx,[posicion]    ;rcx = posicion
-    dec        rcx                ;(posicion-1)
-    imul    ebx,ecx,2        ;(posicion-1)*longElem
+        mov        rcx,[posicion]    ;rcx = posicion
+        dec        rcx                ;(posicion-1)
+        imul    ebx,ecx,2        ;(posicion-1)*longElem
 
-    mov     word[vecNum+ebx],-1
+        mov     word[vecNum+ebx],-1
 
-    cmp qword[suma],11
-    je nuevoPaquete
+        cmp qword[suma],11
+        je nuevoPaquete
 
-    jmp recorrer
+        jmp recorrer
 
-checkVacio:
-    cmp qword[suma],0
-    jg nuevoPaquete
-    mov rcx,debug
-    call printf
-ret
+    checkVacio:
+        cmp qword[suma],0
+        jg nuevoPaquete
+        mov rcx,debug
+        call printf
+    ret
