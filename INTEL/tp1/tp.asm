@@ -18,6 +18,16 @@ section    .data
 section    .text
 main:
     sub  rsp,32
+    call crearPaquetes
+
+fin:
+    mov rcx,msgSalida
+    call printf
+    add  rsp,32
+    ret
+
+
+crearPaquetes:
 nuevoPaquete:
     add qword[paquetes],1
     mov rcx,msgNuevoPaquete
@@ -91,10 +101,4 @@ checkVacio:
     jg nuevoPaquete
     mov rcx,debug
     call printf
-    jmp fin
-
-fin:
-    mov rcx,msgSalida
-    call printf
-    add  rsp,32
-    ret
+ret
