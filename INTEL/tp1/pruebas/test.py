@@ -2,6 +2,7 @@ def grupos(mw:int, wt:list):
     n = len(wt)
     i = 0
     suma = 0
+    count = 0
     pack = []
     while n > 0:
         while suma < mw and i<len(wt):
@@ -11,7 +12,8 @@ def grupos(mw:int, wt:list):
                 wt[i] = 0
                 n = n-1
             i+=1
-        print(pack, suma)
+        count += 1
+        print(count,pack, suma)
         pack = []
         suma = 0
         i = 0
