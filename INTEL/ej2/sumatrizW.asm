@@ -21,6 +21,7 @@ section	.data
     msjErrorInput       db  "Los datos ingresados son inválidos.  Intente nuevamente."
 	sumatoria		dd 0
 	msjSumatoria	db	"La sumatoria es: %i",10,0
+	debug			db	"DEBUG",10,0
 
 
 ;   matriz  dw  1,1,1,1,1,2,2,2,2,2,3,3,3,3,3,4,4,4,4,4,5,5,5,5,5		
@@ -53,6 +54,8 @@ main:
 
 	call	validarFyC
 
+	mov rcx,debug
+	call printf
 	
 	cmp		byte[inputValido],'S'
 	je		continuar
@@ -63,7 +66,7 @@ main:
     add     rsp,32
     jmp     main
 
-continuar:	
+continuar:
 	
 	call	calcDesplaz
 

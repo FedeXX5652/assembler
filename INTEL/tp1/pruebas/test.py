@@ -20,9 +20,10 @@ def grupos(mw:int, wt:list):
 
 
  
-wt = [8,7,6,9,5,11,5,9,4,1,1,1,1,3,5]
+wts = [[8,7,6,9,5,11,5,9,4,1,1,1,1,3,5],[2,9,8,5,6,2,4,7,8,5,4,10,10,4,2],[7,9,1,6,4,2,2,6,1,3,8,1,5,9,7]]
 mw = 11
-print("ORDENADO")
-grupos(mw, sorted(wt, reverse=True))
-print("\nDESORDENADO")
-grupos(mw, wt)
+for wti in range(len(wts)):
+    # print("\n--------------------\nORDENADO:", wti)
+    # grupos(mw, sorted(wts[wti], reverse=True))
+    print("\n--------------------\nDESORDENADO", wti+1, "Elementos:", len(wts[wti]))
+    grupos(mw, wts[wti])
