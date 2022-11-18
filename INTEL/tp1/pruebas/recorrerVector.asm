@@ -2,8 +2,7 @@ global     main
 extern     printf
 
 section    .data
-    msgSal      db  'Elementos guardados en posicion %i: %i',10,0
-    msgInt     db  'NRO: %i',10,0
+    msgSal      db  'Elementos guardados en posicion %i: %i - ',10,10,0
     vecNum      dw  8,7,6,9,5,11,5,9,4,1,1,1,1,3,5
     tope        dq  5
     posicion    dq  0
