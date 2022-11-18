@@ -11,6 +11,10 @@ section    .data
     msgSalida       db  'Salida',10,0
     msgSalidaPaquete    db  'Salida paquetes',10,0
     debug       db  'DEBUG',10,0
+    msgCiclo    db  'Ciclo de nuevo',10,0
+    msgFil      db  'Fila: %i',10,0
+    msgTope     db  'Tope: %i',10,0
+
 ; times   15      dw      -1
     matNum      dw  8,7,6,9,5,11,5,9,4,1,1,1,1,3,5
                 dw  2,9,8,5,6,2,4,7,8,5,4,10,10,4,2
@@ -31,20 +35,39 @@ main:
         inc qword[posFil]
         mov qword[paquetes],0
         
+        sub  rsp,32
         mov rcx,msgSeparador
         mov rdx,[posFil]
         call printf
+        add  rsp,32
+
+        ;sub  rsp,32
+        ;mov rcx,msgTope
+        ;mov rdx,[TOPE_FIL]
+        ;call printf
+        ;add  rsp,32
+
+        ;sub  rsp,32
+        ;mov rcx,msgFil
+        ;mov rdx,[posFil]
+        ;call printf
+        ;add  rsp,32
+
 
         call crearPaquetes
 
-        mov r10,[posFil]
-        mov r11,[TOPE_COL]
+        cmp qword[posFil],3
+        je fin
 
-        cmp r10,r11
-        jl fin
+        sub  rsp,32
+        mov rcx,msgCiclo
+        call printf
+        add  rsp,32
+
         jmp cicloCol
 
 fin:
+    sub  rsp,32
     mov rcx,msgSalida
     call printf
     add  rsp,32
@@ -52,19 +75,15 @@ fin:
 
 
 crearPaquetes:
-    mov rcx,msgInt
-    mov rdx,[posFil]
-    call printf
-
-    mov rcx,msgInt
-    mov rdx,[TOPE_FIL]
-    call printf
-
     nuevoPaquete:
         inc qword[paquetes]
+
+        sub  rsp,32
         mov rcx,msgNuevoPaquete
         mov rdx,[paquetes]
         call printf
+        add  rsp,32
+
         mov rbx,0
         mov qword[suma],0
 
@@ -75,12 +94,7 @@ crearPaquetes:
         mov [pos],eax
     suma0:
         sub [suma],rbx
-        ;mov rcx,msgSuma0
-        ;mov rdx,[suma]
-        ;call printf
     recorrer:
-        ;mov r11,[pos]
-        
         inc qword[pos]
 
         ; desplazamiento en fila
@@ -94,12 +108,6 @@ crearPaquetes:
         imul    ebx,ecx,2        ;(posicion-1)*longElem
 
         add ebx,eax
-
-        ;mov eax,ebx
-        ;cdqe
-        ;mov rcx,msgInt
-        ;mov rdx,rax
-        ;call printf
 
         ; obtengo valor en matriz
         mov        ax,[matNum+ebx]    ;ax = elemento (2 bytes / word)
@@ -119,21 +127,19 @@ crearPaquetes:
 
         cmp rbx,-1
         je recorrer
-
-        ;mov rcx,msgInt
-        ;mov rdx,[pos]
-        ;call printf
         
         add [suma],rbx
 
         cmp qword[suma],11
         jg suma0
 
+        sub  rsp,32
         mov rcx,msgSuma
         mov rdx,rbx
         mov r8,[suma]
         mov r9,[pos]
         call printf
+        add  rsp,32
 
         ; desplazamiento en fila
         mov        rcx,[posFil]
@@ -156,7 +162,13 @@ crearPaquetes:
 
     checkVacio:
         cmp qword[suma],0
-        jg nuevoPaquete
+        jle retCrearPaquetes
+
+        jmp nuevoPaquete
+    retCrearPaquetes:
+        sub  rsp,32
         mov rcx,msgSalidaPaquete
         call printf
-        call cicloCol
+        add  rsp,32
+        
+        ret
