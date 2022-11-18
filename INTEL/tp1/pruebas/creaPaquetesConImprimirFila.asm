@@ -44,19 +44,6 @@ main:
         call imprimirFila
         mov qword[posCol],0
 
-        ;sub  rsp,32
-        ;mov rcx,msgTope
-        ;mov rdx,[TOPE_FIL]
-        ;call printf
-        ;add  rsp,32
-
-        ;sub  rsp,32
-        ;mov rcx,msgFil
-        ;mov rdx,[posFil]
-        ;call printf
-        ;add  rsp,32
-
-
         call crearPaquetes
 
         cmp qword[posFil],3

@@ -6,11 +6,10 @@ section    .data
     msgInt     db  'NRO: %i',10,0
     msgNuevoPaquete       db  '  Nuevo Paquete n %i:',10,0
     msgSuma     db  '    VAL: %i, SUMA: %i, POS: %i',10,10,10,0
-    msgSeparador    db  '------------------CLUSTER: %i------------------',10,0
-    msgSalida       db  'Salida',10,0
-    msgSalidaPaquete    db  'Salida paquetes',10,0
+    msgSeparador    db  '------------------AGRUPACION: %i------------------',10,0
+    msgSalida       db  'Fin del programa',10,0
+    msgSalidaPaquete    db  'No se pueden crear mas paquetes',10,0
     debug       db  'DEBUG',10,0
-    msgCiclo    db  'Ciclo de nuevo',10,0
     msgFil      db  'Fila: %i',10,0
     msgTope     db  'Tope: %i',10,0
 
@@ -28,6 +27,10 @@ section    .data
     suma        dq  0
     paquetes    dq  0
 
+    MDP         db  'MAR DEL PLATA',0
+    POSADAS     db  'POSADAS',0
+    BARILOCHE   db  'BARILOCHE',0
+
 section    .text
 main:
     sub  rsp,32
@@ -44,28 +47,10 @@ main:
         call imprimirFila
         mov qword[posCol],0
 
-        ;sub  rsp,32
-        ;mov rcx,msgTope
-        ;mov rdx,[TOPE_FIL]
-        ;call printf
-        ;add  rsp,32
-
-        ;sub  rsp,32
-        ;mov rcx,msgFil
-        ;mov rdx,[posFil]
-        ;call printf
-        ;add  rsp,32
-
-
         call crearPaquetes
 
         cmp qword[posFil],3
         je fin
-
-        sub  rsp,32
-        mov rcx,msgCiclo
-        call printf
-        add  rsp,32
 
         jmp cicloCol
 
@@ -177,7 +162,6 @@ crearPaquetes:
         mov rcx,msgSalidaPaquete
         call printf
         add  rsp,32
-        
         ret
 
 
