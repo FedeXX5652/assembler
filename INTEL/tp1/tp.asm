@@ -2,7 +2,7 @@ global     main
 extern     printf
 
 section    .data
-    msgSal      db  'Nro en posicion %i: %i',10,10,0
+    msgDato      db  'Nro en posicion %i: %i',10,10,0
     msgInt     db  'NRO: %i',10,0
     msgNuevoPaquete       db  '  Nuevo Paquete n %i:',10,0
     msgSuma     db  '    VAL: %i, SUMA: %i, POS: %i',10,10,10,0
@@ -27,6 +27,8 @@ section    .data
     suma        dq  0
     paquetes    dq  0
 
+    desplazamiento dq 0
+
     MDP         db  'MAR DEL PLATA',0
     POSADAS     db  'POSADAS',0
     BARILOCHE   db  'BARILOCHE',0
@@ -47,7 +49,7 @@ main:
         call imprimirFila
         mov qword[posCol],0
 
-        call crearPaquetes
+        ;call crearPaquetes
 
         cmp qword[posFil],3
         je fin
@@ -106,7 +108,7 @@ crearPaquetes:
         cwde                    ;eax= elemento (4 bytes / doble word)
         cdqe                    ;rax= elemento (8 bytes / quad word)
 
-        imul    ebx,ecx,10        ;(posicion-1)*longElem
+        imul    ebx,ecx,2        ;(posicion-1)*longElem
 
         mov rbx,rax
 
@@ -167,20 +169,15 @@ crearPaquetes:
 
 ; funcion para imprimir el contenido de la fila actual
 imprimirFila:
-    inc qword[pos]
     inc qword[posCol]
 
-    mov rcx, 15
-    cmp rcx,[posCol]
-    jl finImprimirFila
-
-    mov        rcx,[pos]    ;rcx = posicion
+    mov        rcx,[posCol]    ;rcx = posicion
     dec        rcx                ;(posicion-1)
     imul    ebx,ecx,2        ;(posicion-1)*longElem
 
-
     mov        rcx,[posFil]
     dec        rcx
+    imul    rcx,[TOPE_COL]
     imul    eax,ecx,2
 
     add ebx,eax
@@ -189,14 +186,16 @@ imprimirFila:
     cwde                    ;eax= elemento (4 bytes / doble word)
     cdqe                    ;rax= elemento (8 bytes / quad word)
 
-    imul    ebx,ecx,10        ;(posicion-1)*longElem
-
     sub        rsp,32
-    mov        rcx,msgSal        ;Param 1: Direccion del mensaje a imprimir
-    mov        rdx,[pos]    ;Param 2: Direccion del primer dato a imprimir (numero)
+    mov        rcx,msgDato        ;Param 1: Direccion del mensaje a imprimir
+    mov        rdx,[posCol]    ;Param 2: Direccion del primer dato a imprimir (numero)
     mov        r8,rax            ;Param 3: Contenido del segundo dato a imprimir (numero)
     call    printf
     add        rsp,32
+
+    mov rcx, 15
+    cmp rcx,[posCol]
+    je finImprimirFila
 
     jmp imprimirFila
 
