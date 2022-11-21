@@ -5,10 +5,10 @@ section    .data
     msgDato      db  'Nro en posicion %i: %i',10,10,0
     msgInt     db  'NRO: %i',10,0
     msgNuevoPaquete       db  '  Nuevo Paquete n %i:',10,0
-    msgSuma     db  '    VAL: %i, SUMA: %i, POS: %i',10,10,10,0
-    msgSeparador    db  '------------------AGRUPACION: %i------------------',10,0
+    msgSuma     db  '      VAL: %i, SUMA: %i, POS: %i',10,0
+    msgSeparador    db  '------------------DESTINO: %s------------------',13,10,0
     msgSalida       db  'Fin del programa',10,0
-    msgSalidaPaquete    db  'No se pueden crear mas paquetes',10,0
+    msgSalidaPaquete    db  'No se pueden crear mas paquetes',10,10,0
     debug       db  'DEBUG',10,0
     msgFil      db  'Fila: %i',10,0
     msgTope     db  'Tope: %i',10,0
@@ -29,6 +29,10 @@ section    .data
 
     desplazamiento dq 0
 
+    MDP_ID         dq  1
+    POSADAS_ID     dq  2
+    BARILOCHE_ID   dq  3
+
     MDP         db  'MAR DEL PLATA',0
     POSADAS     db  'POSADAS',0
     BARILOCHE   db  'BARILOCHE',0
@@ -40,11 +44,7 @@ main:
         inc qword[posFil]
         mov qword[paquetes],0
         
-        sub  rsp,32
-        mov rcx,msgSeparador
-        mov rdx,[posFil]
-        call printf
-        add  rsp,32
+        call imprimirDestino
 
         call imprimirFila
         mov qword[posCol],0
@@ -187,4 +187,44 @@ imprimirFila:
     jmp imprimirFila
 
     finImprimirFila:
+        ret
+
+imprimirDestino:
+    mov rcx,[posFil]
+    cmp [MDP_ID],rcx
+    je imrpimirMDP
+
+    mov rcx,[posFil]
+    cmp [POSADAS_ID],rcx
+    je imrpimirPOSADAS
+
+    mov rcx,[posFil]
+    cmp [BARILOCHE_ID],rcx
+    je imrpimirBARILOCHE
+
+    imrpimirMDP:
+        sub rsp,32
+        mov rcx,msgSeparador
+        mov rdx,MDP
+        call printf
+        add rsp,32
+        jmp finImprimirDestino
+
+    imrpimirPOSADAS:
+        sub rsp,32
+        mov rcx,msgSeparador
+        mov rdx,POSADAS
+        call printf
+        add rsp,32
+        jmp finImprimirDestino
+
+    imrpimirBARILOCHE:
+        sub rsp,32
+        mov rcx,msgSeparador
+        mov rdx,BARILOCHE
+        call printf
+        add rsp,32
+        jmp finImprimirDestino
+
+    finImprimirDestino:
         ret
