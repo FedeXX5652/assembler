@@ -39,7 +39,6 @@ section    .data
 
 section    .text
 main:
-    sub  rsp,32
     cicloCol:
         inc qword[posFil]
         mov qword[paquetes],0
