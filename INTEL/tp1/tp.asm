@@ -20,10 +20,10 @@ section    .data
 
     TOPE_FIL    dq  3
     TOPE_COL    dq  15
+    TOPE_PESO   dq  11
 
     posFil      dq  0
     posCol      dq  0
-    pos         dq  0
     suma        dq  0
     paquetes    dq  0
 
@@ -48,8 +48,11 @@ main:
 
         call imprimirFila
         mov qword[posCol],0
+        mov qword[suma],0
 
-        ;call crearPaquetes
+        call crearPaquetes
+        mov qword[posCol],0
+        mov qword[suma],0
 
         cmp qword[posFil],3
         je fin
@@ -72,98 +75,82 @@ crearPaquetes:
     nuevoPaquete:
         inc qword[paquetes]
 
-        sub  rsp,32
+        sub rsp,32
         mov rcx,msgNuevoPaquete
         mov rdx,[paquetes]
         call printf
-        add  rsp,32
+        add rsp,32
 
-        mov rbx,0
+        mov qword[posCol],0
         mov qword[suma],0
+    iterar:
+        inc qword[posCol]
+
+        mov        rcx,[posCol]
+        dec        rcx
+        imul    ebx,ecx,2
 
         mov        rcx,[posFil]
         dec        rcx
+        imul    rcx,[TOPE_COL]
         imul    eax,ecx,2
-
-        mov [pos],eax
-    suma0:
-        sub [suma],rbx
-    recorrer:
-        inc qword[pos]
-
-        ; desplazamiento en fila
-        mov        rcx,[posFil]
-        dec        rcx
-        imul    eax,ecx,2
-        
-        ; desplazamiento en columna
-        mov        rcx,[pos]    ;rcx = posicion
-        dec        rcx                ;(posicion-1)
-        imul    ebx,ecx,2        ;(posicion-1)*longElem
 
         add ebx,eax
 
-        ; obtengo valor en matriz
+        mov rcx,[TOPE_COL]
+        cmp [posCol],rcx        ; Salto por ultimo valor del vector
+        jg checkPaquete
+
         mov        ax,[matNum+ebx]    ;ax = elemento (2 bytes / word)
         cwde                    ;eax= elemento (4 bytes / doble word)
         cdqe                    ;rax= elemento (8 bytes / quad word)
 
-        imul    ebx,ecx,2        ;(posicion-1)*longElem
-
         mov rbx,rax
 
-        ; chequeo que no se haya pasado de fila
-        mov rax,[TOPE_COL]
-        imul rax,[posFil]
-        mov rcx,rax
-        cmp rcx,[pos]
-        jl checkVacio
+        cmp rbx,-1          ; Salto por valor usado o invalido
+        je iterar
 
-        cmp rbx,-1
-        je recorrer
-        
+        add rax,[suma]
+        cmp rax,[TOPE_PESO]
+        jg iterar
+
+        ; ejecuto la suma y reemplazo del valor
         add [suma],rbx
 
-        cmp qword[suma],11
-        jg suma0
+        mov        rcx,[posCol]
+        dec        rcx
+        imul    ebx,ecx,2
 
-        sub  rsp,32
-        mov rcx,msgSuma
-        mov rdx,rbx
-        mov r8,[suma]
-        mov r9,[pos]
-        call printf
-        add  rsp,32
-
-        ; desplazamiento en fila
         mov        rcx,[posFil]
         dec        rcx
+        imul    rcx,[TOPE_COL]
         imul    eax,ecx,2
 
-        ; desplazamiento en columna
-        mov        rcx,[pos]    ;rcx = pos
-        dec        rcx                ;(pos-1)
-        imul    ebx,ecx,2        ;(pos-1)*longElem
-
         add ebx,eax
+        mov        ax,[matNum+ebx]
+        cwde
+        cdqe
+        mov word[matNum+ebx],-1
 
-        mov     word[matNum+ebx],-1
 
-        cmp qword[suma],11
-        je nuevoPaquete
+        sub rsp,32
+        mov rcx,msgSuma
+        mov rdx,rax
+        mov r8,[suma]
+        mov r9,[posCol]
+        call printf
+        add rsp,32
 
-        jmp recorrer
+        jmp iterar
 
-    checkVacio:
+    checkPaquete:
         cmp qword[suma],0
-        jle retCrearPaquetes
-
-        jmp nuevoPaquete
-    retCrearPaquetes:
-        sub  rsp,32
+        jg nuevoPaquete
+    finCrearPaquetes:
+        sub rsp,32
         mov rcx,msgSalidaPaquete
         call printf
-        add  rsp,32
+        add rsp,32
         ret
 
 
