@@ -29,14 +29,18 @@ section .data
     msgInt db 'NRO: %i',10,0
 
     ; Matriz de datos
-    matNum  times   20      dw      -1      ; Mar del Plata
-            times   20      dw      -1      ; Posadas
-            times   20      dw      -1      ; Bariloche
+    matNum  dq  8,7,6,9,5,11,5,9,4,1,1,1,1,3,5;times   20      dq      -1      ; Mar del Plata
+            dq  2,9,8,5,6,2,4,7,8,5,4,10,10,4,2;times   20      dq      -1      ; Posadas
+            dq  7,9,1,6,4,2,2,6,1,3,8,1,5,9,7;times   20      dq      -1      ; Bariloche
 
     ; Topes
     TOPE_FIL dq 3
-    TOPE_COL dq 20
+    TOPE_COL dq 15
     TOPE_PESO dq 11
+    TOPE_DATOS dq 3
+    TOPE_MDP dq 0
+    TOPE_POSADAS dq 0
+    TOPE_BARILOCHE dq 0
 
     ; Datos
     peso dq 0
@@ -46,6 +50,7 @@ section .data
     suma dq 0
     paquetes dq 0
     desplazamiento dq 0
+    datosIngresados dq 0
 
     ; Datos de destinos
     MDP_ID dq 1
@@ -61,7 +66,7 @@ section .bss
 
 section    .text
 main:
-    call llenarMatriz
+    ;call llenarMatriz
     cicloCol:
         inc qword[posFil]
         mov qword[paquetes],0
@@ -72,9 +77,9 @@ main:
         mov qword[posCol],0
         mov qword[suma],0
 
-        ;call crearPaquetes
-        ;mov qword[posCol],0
-        ;mov qword[suma],0
+        call crearPaquetes
+        mov qword[posCol],0
+        mov qword[suma],0
 
         cmp qword[posFil],3
         je fin
@@ -92,7 +97,7 @@ fin:
 ;                                   Funciones Internas
 ;--------------------------------------------------------------------------------------------
 
-; funcion que crea los grupos de paquetes
+; Funcion que crea los grupos de paquetes
 crearPaquetes:
     nuevoPaquete:
         inc qword[paquetes]
@@ -110,12 +115,12 @@ crearPaquetes:
 
         mov        rcx,[posCol]
         dec        rcx
-        imul    ebx,ecx,2
+        imul    ebx,ecx,8
 
         mov        rcx,[posFil]
         dec        rcx
         imul    rcx,[TOPE_COL]
-        imul    eax,ecx,2
+        imul    eax,ecx,8
 
         add ebx,eax
 
@@ -123,35 +128,32 @@ crearPaquetes:
         cmp [posCol],rcx        ; Salto por ultimo valor del vector
         jg checkPaquete
 
-        mov        ax,[matNum+ebx]    ;ax = elemento (2 bytes / word)
-        cwde                    ;eax= elemento (4 bytes / doble word)
-        cdqe                    ;rax= elemento (8 bytes / quad word)
+        mov        rax,[matNum+ebx]    ;ax = elemento (2 bytes / word)
 
         mov rbx,rax
-
-        cmp rbx,-1          ; Salto por valor usado o invalido
-        je iterar
 
         add rax,[suma]
         cmp rax,[TOPE_PESO]
         jg iterar
+
+        cmp rbx,-1          ; Salto por valor usado o invalido
+        je iterar
 
         ; ejecuto la suma y reemplazo del valor
         add [suma],rbx
 
         mov        rcx,[posCol]
         dec        rcx
-        imul    ebx,ecx,2
+        imul    ebx,ecx,8
 
         mov        rcx,[posFil]
         dec        rcx
         imul    rcx,[TOPE_COL]
-        imul    eax,ecx,2
+        imul    eax,ecx,8
 
         add ebx,eax
-        mov        ax,[matNum+ebx]
-        cwde
-        cdqe
+        mov        rax,[matNum+ebx]
+
         mov word[matNum+ebx],-1
 
 
@@ -176,24 +178,26 @@ crearPaquetes:
         ret
 
 
-; funcion para imprimir el contenido de la fila actual
+; Funcion para imprimir el contenido de la fila actual
 imprimirFila:
     inc qword[posCol]
 
     mov        rcx,[posCol]    ;rcx = posicion
     dec        rcx                ;(posicion-1)
-    imul    ebx,ecx,2        ;(posicion-1)*longElem
+    imul    ebx,ecx,8        ;(posicion-1)*longElem
 
     mov        rcx,[posFil]
     dec        rcx
     imul    rcx,[TOPE_COL]
-    imul    eax,ecx,2
+    imul    eax,ecx,8
 
     add ebx,eax
 
-    mov        ax,[matNum+ebx]    ;ax = elemento (2 bytes / word)
-    cwde                    ;eax= elemento (4 bytes / doble word)
-    cdqe                    ;rax= elemento (8 bytes / quad word)
+    mov        rax,[matNum+ebx]    ;ax = elemento (2 bytes / word)
+
+    mov rbx,rax
+    cmp rbx,-1
+    je imprimirFila
 
     sub        rsp,32
     mov        rcx,msgDato        ;Param 1: Direccion del mensaje a imprimir
@@ -211,6 +215,7 @@ imprimirFila:
     finImprimirFila:
         ret
 
+; Funcion para imprimir el destino con separador
 imprimirDestino:
     mov rcx,[posFil]
     cmp [MDP_ID],rcx
@@ -251,23 +256,32 @@ imprimirDestino:
     finImprimirDestino:
         ret
 
+; Funcion para pedir los datos al usuario y llenar la matriz
 llenarMatriz:
     jmp ingresoPeso
 
     pesoErroneo:
+        sub rsp,32
         mov rcx,msgPesoError
         call printf
+        add rsp,32
     ingresoPeso:
+        sub rsp,32
         mov rcx,msgIngresoPeso
         call printf
+        add rsp,32
 
+        sub rsp,32
         mov rcx,buffer
         call gets
+        add rsp,32
 
+        sub rsp,32
         mov rcx,buffer
         mov rdx,parserInt
         mov r8,peso
         call sscanf
+        add rsp,32
 
         cmp rax,1
         jl ingresoPeso
@@ -279,19 +293,27 @@ llenarMatriz:
         jmp ingresoDestino
 
     destinoErroneo:
+        sub rsp,32
         mov rcx,msgDestinoError
         call printf
+        add rsp,32
     ingresoDestino:
+        sub rsp,32
         mov rcx,msgIngresoDestino
         call printf
+        add rsp,32
 
+        sub rsp,32
         mov rcx,buffer
         call gets
+        add rsp,32
 
+        sub rsp,32
         mov rcx,buffer
         mov rdx,parserInt
         mov r8,destino
         call sscanf
+        add rsp,32
 
         cmp rax,1
         jl ingresoDestino
@@ -304,5 +326,82 @@ llenarMatriz:
         cmp rcx,3
         jg destinoErroneo
     
+    call insertarDato
+    mov rcx,[TOPE_DATOS]
+    cmp qword[datosIngresados],rcx
+    jl ingresoPeso
+
     finLlenarMatriz:
+        ret
+
+; Funcion para insertar el dato en la matriz
+insertarDato:
+    ; insertar dato Mar del Plata
+    mov rcx,[destino]
+    cmp rcx,0
+    je insertarMDP
+
+    ; insertar dato Posadas
+    mov rcx,[destino]
+    cmp rcx,0
+    je insertarPOSADAS
+
+    ; insertar dato Bariloche
+    mov rcx,[destino]
+    cmp rcx,0
+    je insertarBARILOCHE
+
+    insertarMDP:
+        inc qword[TOPE_MDP]
+
+        mov        rcx,[TOPE_MDP]
+        dec        rcx
+        imul    ebx,ecx,8
+
+        mov        rcx,[destino]
+        dec        rcx
+        imul    rcx,[TOPE_COL]
+        imul    eax,ecx,8
+
+        add ebx,eax
+
+        mov rcx,[peso]
+        mov [matNum+ebx],rcx
+
+    insertarPOSADAS:
+        inc qword[TOPE_POSADAS]
+    
+        mov        rcx,[TOPE_POSADAS]
+        dec        rcx
+        imul    ebx,ecx,8
+
+        mov        rcx,[destino]
+        dec        rcx
+        imul    rcx,[TOPE_POSADAS]
+        imul    eax,ecx,8
+
+        add ebx,eax
+
+        mov rcx,[peso]
+        mov [matNum+ebx],rcx
+
+    insertarBARILOCHE:
+        inc qword[TOPE_BARILOCHE]
+
+        mov        rcx,[TOPE_BARILOCHE]
+        dec        rcx
+        imul    ebx,ecx,8
+
+        mov        rcx,[destino]
+        dec        rcx
+        imul    rcx,[TOPE_COL]
+        imul    eax,ecx,8
+
+        add ebx,eax
+
+        mov rcx,[peso]
+        mov [matNum+ebx],rcx
+
+    finInsertarDato:
+        inc qword[datosIngresados]
         ret

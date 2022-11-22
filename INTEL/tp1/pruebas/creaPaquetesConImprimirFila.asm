@@ -5,7 +5,7 @@ section    .data
     msgDato      db  'Nro en posicion %i: %i',10,10,0
     msgInt     db  'NRO: %i',10,0
     msgNuevoPaquete       db  '  Nuevo Paquete n %i:',10,0
-    msgSuma     db  '    VAL: %i, SUMA: %i, POS: %i',10,10,10,0
+    msgSuma     db  '    VAL: %hi, SUMA: %hi, POS: %hi',10,10,10,0
     msgSeparador    db  '------------------AGRUPACION: %i------------------',10,0
     msgSalida       db  'Fin del programa',10,0
     msgSalidaPaquete    db  'No se pueden crear mas paquetes',10,0
@@ -14,9 +14,9 @@ section    .data
     msgTope     db  'Tope: %i',10,0
 
 ; times   15      dw      -1
-    matNum      dw  8,7,6,9,5,11,5,9,4,1,1,1,1,3,5
-                dw  2,9,8,5,6,2,4,7,8,5,4,10,10,4,2
-                dw  7,9,1,6,4,2,2,6,1,3,8,1,5,9,7
+    matNum      dq  8,7,6,9,5,11,5,9,4,1,1,1,1,3,5
+                dq  2,9,8,5,6,2,4,7,8,5,4,10,10,4,2
+                dq  7,9,1,6,4,2,2,6,1,3,8,1,5,9,7
 
     TOPE_FIL    dq  3
     TOPE_COL    dq  15
@@ -83,7 +83,7 @@ crearPaquetes:
 
         mov        rcx,[posFil]
         dec        rcx
-        imul    eax,ecx,2
+        imul    eax,ecx,8
 
         mov [pos],eax
     suma0:
@@ -94,21 +94,19 @@ crearPaquetes:
         ; desplazamiento en fila
         mov        rcx,[posFil]
         dec        rcx
-        imul    eax,ecx,2
+        imul    eax,ecx,8
         
         ; desplazamiento en columna
         mov        rcx,[pos]    ;rcx = posicion
         dec        rcx                ;(posicion-1)
-        imul    ebx,ecx,2        ;(posicion-1)*longElem
+        imul    ebx,ecx,8        ;(posicion-1)*longElem
 
         add ebx,eax
 
         ; obtengo valor en matriz
-        mov        ax,[matNum+ebx]    ;ax = elemento (2 bytes / word)
-        cwde                    ;eax= elemento (4 bytes / doble word)
-        cdqe                    ;rax= elemento (8 bytes / quad word)
+        mov        rax,[matNum+ebx]    ;ax = elemento (2 bytes / word)
 
-        imul    ebx,ecx,2        ;(posicion-1)*longElem
+        imul    ebx,ecx,8        ;(posicion-1)*longElem
 
         mov rbx,rax
 
@@ -138,12 +136,12 @@ crearPaquetes:
         ; desplazamiento en fila
         mov        rcx,[posFil]
         dec        rcx
-        imul    eax,ecx,2
+        imul    eax,ecx,8
 
         ; desplazamiento en columna
         mov        rcx,[pos]    ;rcx = pos
         dec        rcx                ;(pos-1)
-        imul    ebx,ecx,2        ;(pos-1)*longElem
+        imul    ebx,ecx,8        ;(pos-1)*longElem
 
         add ebx,eax
 
@@ -173,18 +171,16 @@ imprimirFila:
 
     mov        rcx,[posCol]    ;rcx = posicion
     dec        rcx                ;(posicion-1)
-    imul    ebx,ecx,2        ;(posicion-1)*longElem
+    imul    ebx,ecx,8        ;(posicion-1)*longElem
 
     mov        rcx,[posFil]
     dec        rcx
     imul    rcx,[TOPE_COL]
-    imul    eax,ecx,2
+    imul    eax,ecx,8
 
     add ebx,eax
 
-    mov        ax,[matNum+ebx]    ;ax = elemento (2 bytes / word)
-    cwde                    ;eax= elemento (4 bytes / doble word)
-    cdqe                    ;rax= elemento (8 bytes / quad word)
+    mov        rax,[matNum+ebx]    ;ax = elemento (2 bytes / word)
 
     sub        rsp,32
     mov        rcx,msgDato        ;Param 1: Direccion del mensaje a imprimir
