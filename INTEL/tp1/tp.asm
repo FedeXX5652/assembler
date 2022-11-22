@@ -1,44 +1,67 @@
-global     main
-extern     printf
+global main
+extern printf
+extern sscanf
+extern gets
 
-section    .data
-    msgDato      db  'Nro en posicion %i: %i',10,10,0
-    msgInt     db  'NRO: %i',10,0
-    msgNuevoPaquete       db  '  Nuevo Paquete n %i:',10,0
-    msgSuma     db  '      VAL: %i, SUMA: %i, POS: %i',10,0
-    msgSeparador    db  '------------------DESTINO: %s------------------',13,10,0
-    msgSalida       db  'Fin del programa',10,0
-    msgSalidaPaquete    db  'No se pueden crear mas paquetes',10,10,0
-    debug       db  'DEBUG',10,0
-    msgFil      db  'Fila: %i',10,0
-    msgTope     db  'Tope: %i',10,0
+; Datos de prueba
+; dw  8,7,6,9,5,11,5,9,4,1,1,1,1,3,5
+; dw  2,9,8,5,6,2,4,7,8,5,4,10,10,4,2
+; dw  7,9,1,6,4,2,2,6,1,3,8,1,5,9,7
 
-; times   15      dw      -1
-    matNum      dw  8,7,6,9,5,11,5,9,4,1,1,1,1,3,5
-                dw  2,9,8,5,6,2,4,7,8,5,4,10,10,4,2
-                dw  7,9,1,6,4,2,2,6,1,3,8,1,5,9,7
+section .data
+    ; Parser
+    parserInt db '%li',0
 
-    TOPE_FIL    dq  3
-    TOPE_COL    dq  15
-    TOPE_PESO   dq  11
+    ; Mensajes
+    msgDato db 'Nro en posicion %i: %i',10,10,0
+    msgNuevoPaquete db '  Nuevo Paquete n %i:',10,0
+    msgAgregoAPaquete db '      VAL: %i, SUMA: %i, POS: %i',10,0
+    msgSeparador db '------------------DESTINO: %s------------------',13,10,0
+    msgSalida db 'Fin del programa',10,0
+    msgSalidaPaquete db 'No se pueden crear mas paquetes',10,10,0
+    msgIngresoDestino db 'Ingrese el destino (1-Mar del Plata / 2-Posadas / 3-Bariloche): ',0
+    msgIngresoPeso  db 'Ingrese el peso (<=11): ',0
+    msgDestinoError db 'Ingrese un destino valido',0
+    msgPesoError db 'Ingrese un peso valido',0,0
 
-    posFil      dq  0
-    posCol      dq  0
-    suma        dq  0
-    paquetes    dq  0
+    ; Mensajes para debug
+    debug db 'DEBUG',10,0
+    msgInt db 'NRO: %i',10,0
 
+    ; Matriz de datos
+    matNum  times   20      dw      -1      ; Mar del Plata
+            times   20      dw      -1      ; Posadas
+            times   20      dw      -1      ; Bariloche
+
+    ; Topes
+    TOPE_FIL dq 3
+    TOPE_COL dq 20
+    TOPE_PESO dq 11
+
+    ; Datos
+    peso dq 0
+    destino dq 0
+    posFil dq 0
+    posCol dq 0
+    suma dq 0
+    paquetes dq 0
     desplazamiento dq 0
 
-    MDP_ID         dq  1
-    POSADAS_ID     dq  2
-    BARILOCHE_ID   dq  3
+    ; Datos de destinos
+    MDP_ID dq 1
+    POSADAS_ID dq 2
+    BARILOCHE_ID dq 3
 
-    MDP         db  'MAR DEL PLATA',0
-    POSADAS     db  'POSADAS',0
-    BARILOCHE   db  'BARILOCHE',0
+    MDP db 'MAR DEL PLATA',0
+    POSADAS db 'POSADAS',0
+    BARILOCHE db 'BARILOCHE',0
+
+section .bss
+    buffer resb 10
 
 section    .text
 main:
+    call llenarMatriz
     cicloCol:
         inc qword[posFil]
         mov qword[paquetes],0
@@ -49,9 +72,9 @@ main:
         mov qword[posCol],0
         mov qword[suma],0
 
-        call crearPaquetes
-        mov qword[posCol],0
-        mov qword[suma],0
+        ;call crearPaquetes
+        ;mov qword[posCol],0
+        ;mov qword[suma],0
 
         cmp qword[posFil],3
         je fin
@@ -133,7 +156,7 @@ crearPaquetes:
 
 
         sub rsp,32
-        mov rcx,msgSuma
+        mov rcx,msgAgregoAPaquete
         mov rdx,rax
         mov r8,[suma]
         mov r9,[posCol]
@@ -226,4 +249,60 @@ imprimirDestino:
         jmp finImprimirDestino
 
     finImprimirDestino:
+        ret
+
+llenarMatriz:
+    jmp ingresoPeso
+
+    pesoErroneo:
+        mov rcx,msgPesoError
+        call printf
+    ingresoPeso:
+        mov rcx,msgIngresoPeso
+        call printf
+
+        mov rcx,buffer
+        call gets
+
+        mov rcx,buffer
+        mov rdx,parserInt
+        mov r8,peso
+        call sscanf
+
+        cmp rax,1
+        jl ingresoPeso
+
+        mov rcx,[peso]
+        cmp rcx,[TOPE_PESO]
+        jg pesoErroneo
+
+        jmp ingresoDestino
+
+    destinoErroneo:
+        mov rcx,msgDestinoError
+        call printf
+    ingresoDestino:
+        mov rcx,msgIngresoDestino
+        call printf
+
+        mov rcx,buffer
+        call gets
+
+        mov rcx,buffer
+        mov rdx,parserInt
+        mov r8,destino
+        call sscanf
+
+        cmp rax,1
+        jl ingresoDestino
+
+        mov rcx,[destino]
+        cmp rcx,0
+        jl destinoErroneo
+
+        mov rcx,[destino]
+        cmp rcx,3
+        jg destinoErroneo
+    
+    finLlenarMatriz:
         ret
