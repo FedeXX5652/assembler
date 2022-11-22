@@ -19,25 +19,27 @@ section .data
     msgSeparador db '------------------DESTINO: %s------------------',13,10,0
     msgSalida db 'Fin del programa',10,0
     msgSalidaPaquete db 'No se pueden crear mas paquetes',10,10,0
-    msgIngresoDestino db 'Ingrese el destino (1-Mar del Plata / 2-Posadas / 3-Bariloche): ',0
-    msgIngresoPeso  db 'Ingrese el peso (<=11): ',0
-    msgDestinoError db 'Ingrese un destino valido',0
-    msgPesoError db 'Ingrese un peso valido',0,0
+    msgIngresoDestino db 'Ingrese el destino (1 - Mar del Plata / 2 - Posadas / 3 - Bariloche / 0 - para salir): ',0
+    msgIngresoPeso  db 'Ingrese el peso (<=11, 0 para salir): ',0
+    msgDestinoError db 'Ingrese un destino valido',10,0
+    msgPesoError db 'Ingrese un peso valido',10,0
+    msgInicioPrograma db 'Bienvenido al packing sort de Federico Galante, a continuacion ingrese los 20 pesos de los objetos a empacar (ingrese "x" para finalizar la entrada de datos):',10,0
 
     ; Mensajes para debug
     debug db 'DEBUG',10,0
     msgInt db 'NRO: %i',10,0
 
     ; Matriz de datos
-    matNum  dq  8,7,6,9,5,11,5,9,4,1,1,1,1,3,5;times   20      dq      -1      ; Mar del Plata
-            dq  2,9,8,5,6,2,4,7,8,5,4,10,10,4,2;times   20      dq      -1      ; Posadas
-            dq  7,9,1,6,4,2,2,6,1,3,8,1,5,9,7;times   20      dq      -1      ; Bariloche
+
+    matNum  times   20      dq      -1      ; Mar del Plata
+            times   20      dq      -1      ; Posadas
+            times   20      dq      -1      ; Bariloche
 
     ; Topes
     TOPE_FIL dq 3
-    TOPE_COL dq 15
+    TOPE_COL dq 20
     TOPE_PESO dq 11
-    TOPE_DATOS dq 3
+    TOPE_DATOS dq 20
     TOPE_MDP dq 0
     TOPE_POSADAS dq 0
     TOPE_BARILOCHE dq 0
@@ -66,7 +68,12 @@ section .bss
 
 section    .text
 main:
-    ;call llenarMatriz
+    sub rsp,32
+    mov rcx,msgInicioPrograma
+    call printf
+    add rsp,32
+
+    call llenarMatriz
     cicloCol:
         inc qword[posFil]
         mov qword[paquetes],0
@@ -81,7 +88,8 @@ main:
         mov qword[posCol],0
         mov qword[suma],0
 
-        cmp qword[posFil],3
+        mov rcx,[TOPE_FIL]
+        cmp qword[posFil],rcx
         je fin
 
         jmp cicloCol
@@ -197,7 +205,7 @@ imprimirFila:
 
     mov rbx,rax
     cmp rbx,-1
-    je imprimirFila
+    je finImprimirFila
 
     sub        rsp,32
     mov        rcx,msgDato        ;Param 1: Direccion del mensaje a imprimir
@@ -290,6 +298,10 @@ llenarMatriz:
         cmp rcx,[TOPE_PESO]
         jg pesoErroneo
 
+        mov rcx,[destino]
+        cmp rcx,0
+        je finLlenarMatriz
+
         jmp ingresoDestino
 
     destinoErroneo:
@@ -318,9 +330,14 @@ llenarMatriz:
         cmp rax,1
         jl ingresoDestino
 
+
         mov rcx,[destino]
         cmp rcx,0
         jl destinoErroneo
+
+        mov rcx,[destino]
+        cmp rcx,0
+        je finLlenarMatriz
 
         mov rcx,[destino]
         cmp rcx,3
@@ -338,17 +355,17 @@ llenarMatriz:
 insertarDato:
     ; insertar dato Mar del Plata
     mov rcx,[destino]
-    cmp rcx,0
+    cmp rcx,1
     je insertarMDP
 
     ; insertar dato Posadas
     mov rcx,[destino]
-    cmp rcx,0
+    cmp rcx,2
     je insertarPOSADAS
 
     ; insertar dato Bariloche
     mov rcx,[destino]
-    cmp rcx,0
+    cmp rcx,3
     je insertarBARILOCHE
 
     insertarMDP:
@@ -368,6 +385,8 @@ insertarDato:
         mov rcx,[peso]
         mov [matNum+ebx],rcx
 
+        jmp finInsertarDato
+
     insertarPOSADAS:
         inc qword[TOPE_POSADAS]
     
@@ -377,13 +396,15 @@ insertarDato:
 
         mov        rcx,[destino]
         dec        rcx
-        imul    rcx,[TOPE_POSADAS]
+        imul    rcx,[TOPE_COL]
         imul    eax,ecx,8
 
         add ebx,eax
 
         mov rcx,[peso]
         mov [matNum+ebx],rcx
+
+        jmp finInsertarDato
 
     insertarBARILOCHE:
         inc qword[TOPE_BARILOCHE]
