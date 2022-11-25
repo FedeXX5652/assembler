@@ -26,7 +26,6 @@ section .data
     msgInicioPrograma   db 'Bienvenido al packing sort de Federico Galante, a continuacion ingrese los 20 pesos de los objetos a empacar (ingrese "x" para finalizar la entrada de datos):',10,0
 
     ; Matriz de datos
-
     matNum  times   20      dq      -1      ; Mar del Plata
             times   20      dq      -1      ; Posadas
             times   20      dq      -1      ; Bariloche
@@ -49,6 +48,7 @@ section .data
     paquetes        dq 0
     desplazamiento  dq 0
     datosIngresados dq 0
+    auxDato         dq 0
 
     ; Datos de destinos
     MDP_ID          dq 1
@@ -68,9 +68,9 @@ main:
     mov     rcx,msgInicioPrograma
     call    printf
     add     rsp,32
-
     call    llenarMatriz
-    cicloCol:
+
+    cicloCol:                       ; itera las filas y crea los paquetes
         inc     qword[posFil]
         mov     qword[paquetes],0
         
@@ -117,22 +117,25 @@ crearPaquetes:
     iterar:
         inc     qword[posCol]
 
+        ; desplazamiento columna
         mov     rcx,[posCol]
         dec     rcx
         imul    ebx,ecx,8
 
+        ; desplazamiento fila
         mov     rcx,[posFil]
         dec     rcx
         imul    rcx,[TOPE_COL]
         imul    eax,ecx,8
 
+        ; desplazamiento total (ebx, eax)
         add     ebx,eax
 
         mov     rcx,[TOPE_COL]
         cmp     [posCol],rcx        ; Salto por ultimo valor del vector
         jg      checkPaquete
 
-        mov     rax,[matNum+ebx]    ;ax = elemento (2 bytes / word)
+        mov     rax,[matNum+ebx]    ;rax = dato en la matriz
 
         mov     rbx,rax
 
@@ -143,8 +146,7 @@ crearPaquetes:
         cmp     rbx,-1          ; Salto por valor usado o invalido
         je      iterar
 
-        ; ejecuto la suma y reemplazo del valor
-        add     [suma],rbx
+        add     [suma],rbx      ; Ejecuto la suma
 
         mov     rcx,[posCol]
         dec     rcx
@@ -158,7 +160,7 @@ crearPaquetes:
         add     ebx,eax
         mov     rax,[matNum+ebx]
 
-        mov     word[matNum+ebx],-1
+        mov     word[matNum+ebx],-1     ; reemplazo el valor utilizado por -1 (para que no se utilice de nuevo)
 
 
         sub     rsp,32
@@ -172,7 +174,7 @@ crearPaquetes:
         jmp     iterar
 
     checkPaquete:
-        cmp     qword[suma],0
+        cmp     qword[suma],0       ; Si la suma es mayor a 0, creo un nuevo paquete
         jg      nuevoPaquete
     finCrearPaquetes:
         sub     rsp,32
@@ -186,35 +188,38 @@ crearPaquetes:
 imprimirFila:
     inc     qword[posCol]
 
-    mov     rcx,[posCol]    ;rcx = posicion
-    dec     rcx                ;(posicion-1)
-    imul    ebx,ecx,8        ;(posicion-1)*longElem
+    ; desplazamiento columna
+    mov     rcx,[posCol]
+    dec     rcx
+    imul    ebx,ecx,8
 
+    ; desplazamiento fila
     mov     rcx,[posFil]
     dec     rcx
     imul    rcx,[TOPE_COL]
     imul    eax,ecx,8
 
+    ; desplazamiento total
     add     ebx,eax
 
-    mov     rax,[matNum+ebx]    ;ax = elemento (2 bytes / word)
+    mov     rax,[matNum+ebx]        ; rax = dato en matriz
 
     mov     rbx,rax
-    cmp     rbx,-1
+    cmp     rbx,-1              ; salto si el valor a imprimir es -1
     je      finImprimirFila
 
     sub     rsp,32
-    mov     rcx,msgDato        ;Param 1: Direccion del mensaje a imprimir
-    mov     rdx,[posCol]    ;Param 2: Direccion del primer dato a imprimir (numero)
-    mov     r8,rax            ;Param 3: Contenido del segundo dato a imprimir (numero)
+    mov     rcx,msgDato
+    mov     rdx,[posCol]        ; imrpimo el dato en la matriz
+    mov     r8,rax
     call    printf
     add     rsp,32
 
     mov     rcx, 15
-    cmp     rcx,[posCol]
+    cmp     rcx,[posCol]        ; salto si llegue al final de la fila
     je      finImprimirFila
 
-    jmp     imprimirFila
+    jmp     imprimirFila        ; itero
 
     finImprimirFila:
         ret
@@ -235,7 +240,7 @@ imprimirDestino:
 
     imrpimirMDP:
         sub     rsp,32
-        mov     rcx,msgSeparador
+        mov     rcx,msgSeparador        ; imrpime el separador de Mar del Plata
         mov     rdx,MDP
         call    printf
         add     rsp,32
@@ -243,7 +248,7 @@ imprimirDestino:
 
     imrpimirPOSADAS:
         sub     rsp,32
-        mov     rcx,msgSeparador
+        mov     rcx,msgSeparador        ; imrpime el separador de Posadas
         mov     rdx,POSADAS
         call    printf
         add     rsp,32
@@ -251,7 +256,7 @@ imprimirDestino:
 
     imrpimirBARILOCHE:
         sub     rsp,32
-        mov     rcx,msgSeparador
+        mov     rcx,msgSeparador        ; imrpime el separador de Bariloche
         mov     rdx,BARILOCHE
         call    printf
         add     rsp,32
