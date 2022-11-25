@@ -23,7 +23,7 @@ section .data
     msgIngresoPeso      db 'Ingrese el peso (0<x<=11, 0 para salir): ',0
     msgDestinoError     db 'Ingrese un destino valido',10,0
     msgPesoError        db 'Ingrese un peso valido',10,0
-    msgInicioPrograma   db 'Bienvenido al packing sort de Federico Galante, a continuacion ingrese los 20 pesos de los objetos a empacar (ingrese "x" para finalizar la entrada de datos):',10,0
+    msgInicioPrograma   db 'Bienvenido al packing sort de Federico Galante, a continuacion ingrese los 20 pesos de los objetos a empacar:',10,0
 
     ; Matriz de datos
     matNum  times   20      dq      -1      ; Mar del Plata
