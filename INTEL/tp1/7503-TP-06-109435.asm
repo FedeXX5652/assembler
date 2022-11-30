@@ -3,10 +3,7 @@ extern printf
 extern sscanf
 extern gets
 
-; Datos de prueba
-; dw  8,7,6,9,5,11,5,9,4,1,1,1,1,3,5
-; dw  2,9,8,5,6,2,4,7,8,5,4,10,10,4,2
-; dw  7,9,1,6,4,2,2,6,1,3,8,1,5,9,7
+; ASSEMBLER INTEL x86 WINDOWS, TP n6, Alumno Federico Galante, Padron 109435
 
 section .data
     ; Parser
