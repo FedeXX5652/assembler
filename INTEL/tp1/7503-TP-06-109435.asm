@@ -23,7 +23,7 @@ section .data
     msgInicioPrograma   db 'Bienvenido al packing sort de Federico Galante, a continuacion ingrese los 20 pesos de los objetos a empacar:',10,0
 
     ; Matriz de datos
-    matNum  times   20      dq      -1      ; Mar del Plata
+    matNum  dq  10,5,4,3,2,1,1,1,2,3,5,7,3,2,1,1,1,-1,-1,-1
             times   20      dq      -1      ; Posadas
             times   20      dq      -1      ; Bariloche
 

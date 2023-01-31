@@ -1,0 +1,75 @@
+- interrupcion de soft: swi
+    * imprimir entero:          swi 0x6b
+    * imprimir string:          swi 0x02
+    * finalizar el programa:    swi 0x11
+    * abrir un archivo:         swi 0x66
+    * leer entero:              swi 0x6c
+    * cerrar un archivo:        swi 0x68
+
+- en la seccion .text va el codigo
+- en la seccion .data van las variables
+- ldr: load word
+- ldrb: load byte
+
+.data
+string1:
+    .asciz "Hola"
+string2:
+    .asciz "Chau"
+.text
+    mov r0, #5
+    mov r1, #7
+    add r2, r0,r1
+    mov r1, r2 @ r1: entero a imprimir
+    mov r1, r2 @ r0: donde imprimir
+    swi 0x6b @ 0x6b: imrpimir entero
+    swi 0x11 @ 0x11: fin de programa
+
+- bl es para llamar a una funcion
+
+operaciones aritmeticas:
+- add a,b @ a+b
+- sub a,b @ a-b
+- rsb a,b @ b-a
+- mul a,b @ a*b
+
+operaciones logicas:
+- and a,b @ a&b
+- orr a,b @ a|b
+- eor a,b @ a^b
+
+operaciones de desplazamiento:
+- mov r0, r1, lsl #1 @ r0 = r1 << 1 (logico)
+- mov r0, r1, lsr #1 @ r0 = r1 >> 1 (logico)
+- mov r0, r1, asr #1 @ r0 = r1 >> 1 (aritmetico)
+
+archivos:
+
+    .data
+filename:
+    .asciz "archivo.txt"
+    .align
+InFileHandle:
+    .word 0
+
+@ apertura
+    ldr r0,=filename        @ (R0) -> nombre de archivo
+    mov r1,#0               @ (R1) -> modo: entrada
+    swi 0x66
+    bcs InFileError
+    ldr r1,=InFileHandle    @ (R1) -> InFileHandle
+    str r0,[r1]             @ almacena handler
+
+@ lectura
+ldr r0,=InFileHandle        @ (R0) -> InFileHandle
+ldr r0,[r0]                 @ (R0) = InFileHandle
+swi 0x6C                    @ (R0) = Entero leído
+
+@ cierre
+ldr r0,=InFileHandle        @ (R0) -> InFileHandle
+ldr r0,[r0]                 @ (R0) = InFileHandle
+swi 0x68
+
+pilas:
+stmfd sp!,{r0-r12, lr} @ apilar los registros y dir. de retorno
+ldmfd sp!,{r0-r12, pc} @ desapilar los registros y retornar
