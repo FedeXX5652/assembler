@@ -44,9 +44,8 @@ _start:
 
 loop:
     bl print_int
-    add r2, r2, #4
-    ldr r1, [r2]
     bl save_r1
+    add r2, r2, #4
     subs r4, r4, #1
     bne loop
     b eof
@@ -54,12 +53,10 @@ loop:
 save_r1:    @ value to save must be in r1
     stmfd sp!, {r0,r1,lr}
     ldr r0, =handler
-    ldr r0, [r0]
+    ldr r1, [r2]
     swi swi_print_int
     ldr r1, =eol
     swi swi_print_str
-    ldr r0, =handler
-    ldr r0, [r0]
     swi swi_close_file
     ldmfd sp!, {r0,r1,pc}
 
@@ -73,10 +70,12 @@ print_int:
     ldmfd sp!, {r0,r1,pc}
 
 fileError:
-    ldr r0, =file_error
+    ldr r0, =stdout
+    ldr r1, =file_error
     swi swi_print_str
 eof:
-    ldr r0, =exit
+    ldr r0, =stdout
+    ldr r1, =exit
     swi swi_print_str
     swi swi_exit
     .end
