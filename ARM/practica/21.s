@@ -33,8 +33,8 @@ loop:
     ldr r4, [r0]    @ r4 = valor del vector
     add r4, r4, r3  @ r4 = r4 + valor
     str r4, [r1]    @ vector_suma = r4
-    add r0, r0, #4  @ r0 = siguiente valor del vector
-    add r1, r1, #4  @ r1 = siguiente valor del vector_suma
+    add r0, r0, #4  @ r0 = siguiente puntero del vector
+    add r1, r1, #4  @ r1 = siguiente puntero del vector_suma
     sub r2, r2, #1 @ r2 = r2 - 1
     cmp r2, #0
     bne loop        @ si r2 != 0, volver a loop
